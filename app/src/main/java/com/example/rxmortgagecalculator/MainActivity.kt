@@ -44,14 +44,12 @@ class MainActivity : AppCompatActivity() {
             obsInterest,
             obsLength
         ) { purchase, down, interest, length ->
-            {
                 calculatePayment(purchase, down, interest, length)
-            }
         }
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ payment ->
-                mortgage_payment.text = payment.invoke().toString()
+                mortgage_payment.text = payment.toString()
             }, { throwable ->
                 Log.e("error", throwable.message)
             })
@@ -95,6 +93,11 @@ class MainActivity : AppCompatActivity() {
     ): Double {
         return ((p - d).times(r.div(12)).times((1 + r.div(12)).pow(l)))
             .div((1 + r.div(12)).pow(l) - 1)
+    }
+
+    override fun onDestroy() {
+        disposables.dispose()
+        super.onDestroy()
     }
 }
 
