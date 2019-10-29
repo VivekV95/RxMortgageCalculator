@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">RxMortgageCalculator</string>
+    <string name="purchase_price">Purchase Price</string>
+    <string name="down_payment">Down Payment</string>
+    <string name="interest_rate">Interest Rate</string>
+    <string name="loan_length">Loan Length</string>
 </resources>
