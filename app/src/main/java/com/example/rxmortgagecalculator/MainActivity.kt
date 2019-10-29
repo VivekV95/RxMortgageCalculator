@@ -21,7 +21,7 @@ import kotlin.math.pow
 
 class MainActivity : AppCompatActivity() {
 
-    val disposables = CompositeDisposable()
+    private val disposables = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,25 +32,31 @@ class MainActivity : AppCompatActivity() {
         val obsInterest = interest_rate.textChanges().validate()
         val obsLength = loan_length.textChanges().validate()
 
-        val obsCombined = Observables.combineLatest(
+        disposables.add(Observables.combineLatest(
             obsPurchase,
             obsDown,
             obsInterest,
             obsLength
         ) { purchase, down, interest, length ->
             {
-                
-            }
-        }
+                calculatePayment(purchase, down, interest, length)
+            } }
+            .subscribeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe{ payment ->
+                mortgage_payment.text = payment.invoke().toString()
+            })
 
         disposables.add(
             getRandomNumbers().subscribe({ numbers ->
-                val i = 0
-            }, { throwable -> Log.e("test", throwable.message) })
+                loan_length.setText("${numbers[0]}")
+            }, { throwable ->
+                Log.e("test", throwable.message)
+            })
         )
     }
 
-    fun getRandomNumbers(): Single<List<Int>> {
+    private fun getRandomNumbers(): Single<List<Int>> {
         return Retrofit.Builder()
             .baseUrl("http://qrng.anu.edu.au/API/")
             .addConverterFactory(GsonConverterFactory.create())
@@ -65,20 +71,20 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    fun InitialValueObservable<CharSequence>.validate(): Observable<Double> {
+    private fun InitialValueObservable<CharSequence>.validate(): Observable<Double> {
         return this
             .filter { it.length > 1 }
             .map { it.toString().toDouble() }
     }
 
-    fun calculatePayment(
-        purchasePrice: Double,
-        downPayment: Double,
-        interestRate: Double,
-        loanLength: Double
+    private fun calculatePayment(
+        p: Double,
+        d: Double,
+        r: Double,
+        l: Double
     ): Double {
-        return ((purchasePrice - downPayment).times(interestRate).times((1 + interestRate).pow(loanLength.times(12))))
-            .div((1 + interestRate).pow(loanLength.times(12)) - 1)
+        return ((p - d).times(r.div(12)).times((1 + r.div(12)).pow(l)))
+            .div((1 + r.div(12)).pow(l) - 1)
     }
 }
 
