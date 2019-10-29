@@ -27,6 +27,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        number_picker.minValue = 1
+        number_picker.maxValue = 30
+        number_picker.setOnValueChangedListener{ _, _, newVal ->
+            loan_length.setText("${newVal.times(12)}")
+        }
+
         val obsPurchase = purchase_price.textChanges().validate()
         val obsDown = down_payment.textChanges().validate()
         val obsInterest = interest_rate.textChanges().validate()
@@ -40,12 +46,16 @@ class MainActivity : AppCompatActivity() {
         ) { purchase, down, interest, length ->
             {
                 calculatePayment(purchase, down, interest, length)
-            } }
+            }
+        }
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe{ payment ->
+            .subscribe({ payment ->
                 mortgage_payment.text = payment.invoke().toString()
+            }, { throwable ->
+                Log.e("error", throwable.message)
             })
+        )
 
         disposables.add(
             getRandomNumbers().subscribe({ numbers ->

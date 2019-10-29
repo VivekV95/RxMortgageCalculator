@@ -23,6 +23,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/purchase_price"
                 android:hint="@string/purchase_price"
+                android:inputType="numberDecimal"
                 android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
@@ -38,6 +39,7 @@
                 android:id="@+id/down_payment"
                 android:hint="@string/down_payment"
                 android:gravity="center"
+                android:inputType="numberDecimal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
@@ -52,6 +54,7 @@
                 android:id="@+id/interest_rate"
                 android:hint="@string/interest_rate"
                 android:gravity="center"
+                android:inputType="numberDecimal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
@@ -66,10 +69,25 @@
                 android:id="@+id/loan_length"
                 android:hint="@string/loan_length"
                 android:gravity="center"
+                android:inputType="numberDecimal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
         </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:text="Select Fixed Rate Loan Length (years)"
+            android:gravity="center"/>
+
+
+        <NumberPicker
+            android:id="@+id/number_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
 
         <TextView
             android:id="@+id/mortgage_payment"
