@@ -17,6 +17,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import kotlin.math.pow
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,19 +36,23 @@ class MainActivity : AppCompatActivity() {
             obsPurchase,
             obsDown,
             obsInterest,
-            obsLength) {purchase, down, interest, length -> {
-        }
+            obsLength
+        ) { purchase, down, interest, length ->
+            {
+                
+            }
         }
 
         disposables.add(
             getRandomNumbers().subscribe({ numbers ->
                 val i = 0
-            }, {throwable -> Log.e("test", throwable.message)}) )
+            }, { throwable -> Log.e("test", throwable.message) })
+        )
     }
 
     fun getRandomNumbers(): Single<List<Int>> {
         return Retrofit.Builder()
-            .baseUrl("https://qrng.anu.edu.au/API/")
+            .baseUrl("http://qrng.anu.edu.au/API/")
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build()
@@ -66,16 +71,22 @@ class MainActivity : AppCompatActivity() {
             .map { it.toString().toDouble() }
     }
 
-    fun calculatePayment(purchasePrice: Double,
-                         downPayment: Double,
-                         interestRate: Double,
-                         loanLength: Double): Double {
+    fun calculatePayment(
+        purchasePrice: Double,
+        downPayment: Double,
+        interestRate: Double,
+        loanLength: Double
+    ): Double {
+        return ((purchasePrice - downPayment).times(interestRate).times((1 + interestRate).pow(loanLength.times(12))))
+            .div((1 + interestRate).pow(loanLength.times(12)) - 1)
     }
 }
 
 interface RandomApi {
 
     @GET("jsonI.php")
-    fun getRandomNumbers(@Query("length")length: String,
-                         @Query("type")type: String): Single<RandomObject>
+    fun getRandomNumbers(
+        @Query("length") length: String,
+        @Query("type") type: String
+    ): Single<RandomObject>
 }
